@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Clear loading message
       activitiesList.innerHTML = "";
+      while (activitySelect.options.length > 1) {
+        activitySelect.remove(1);
+      }
 
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
@@ -25,7 +28,25 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <div class="participants-section">
+            <h5>Participants</h5>
+            <ul class="participants-list"></ul>
+          </div>
         `;
+
+        const participantsList = activityCard.querySelector(".participants-list");
+        if (details.participants.length > 0) {
+          details.participants.forEach((participant) => {
+            const listItem = document.createElement("li");
+            listItem.textContent = participant;
+            participantsList.appendChild(listItem);
+          });
+        } else {
+          const emptyMessage = document.createElement("p");
+          emptyMessage.className = "participants-empty";
+          emptyMessage.textContent = "No participants yet";
+          participantsList.replaceWith(emptyMessage);
+        }
 
         activitiesList.appendChild(activityCard);
 
@@ -59,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await response.json();
 
       if (response.ok) {
+        await fetchActivities();
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
